@@ -54,7 +54,6 @@ public class FlashCard : MonoBehaviour
         if (this.InputActivated)
         {
             //Update Input
-            //ToDo check for backspace
             //ToDo check for enter
             string inputStr = Input.inputString;
 
@@ -73,17 +72,18 @@ public class FlashCard : MonoBehaviour
                 }
             }
 
-            if (Input.GetKey(KeyCode.Backspace))
+            if (Input.GetKeyUp(KeyCode.Backspace)) // ToDo make this support holding the key down to deleter a bunch 
             {
                 if (this.inputBuilder.Length > 0)
                 {
                     this.inputBuilder.Length = inputBuilder.Length - 1;
+                    this.lastInputRecievedTime = Time.time;
                 }
 
                 if (this.inputBuilder.Length == 0)
                 {
-                    // AlsoDoes reset
-                    this.CheckInputAnswer();
+                    this.SetNeutralAnswer(null);
+                    this.ResetInputCapture();
                 }
                 else
                 {
@@ -126,6 +126,16 @@ public class FlashCard : MonoBehaviour
         this.op.SetOperator(Operator.Plus);
 
         this.SetNeutralAnswer(null);
+
+        ResetInputCapture();
+    }
+
+    private void ResetInputCapture()
+    {
+        // Reset Input 
+        this.inputBuilder.Length = 0;
+        this.inputBuilder.Append("");
+        this.recievingInput = false;
     }
 
     private void CheckInputAnswer()
@@ -140,11 +150,6 @@ public class FlashCard : MonoBehaviour
             // ToDo: fix: Could be 0 (or something) if a non number sneaks in somehow...
             this.CheckAnswer(int.Parse(inputSoFar));
         }
-
-        // Reset Input 
-        this.inputBuilder.Length = 0;
-        this.inputBuilder.Append("");
-        this.recievingInput = false;
     }
 
     private void CheckAnswer(int a)
